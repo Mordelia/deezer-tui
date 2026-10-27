@@ -109,6 +109,7 @@ std::optional<std::vector<Item>> user_favorite_albums(Session& session,
     item.id = json_id(entry, "ALB_ID");
     item.title = json_string(entry, "ALB_TITLE");
     item.subtitle = json_string(entry, "ART_NAME");
+    item.count = kUnknownCount;
     items.push_back(std::move(item));
   }
   return items;
@@ -127,6 +128,7 @@ std::optional<std::vector<Item>> user_favorite_artists(Session& session,
     item.kind = ItemKind::Artist;
     item.id = json_id(entry, "ART_ID");
     item.title = json_string(entry, "ART_NAME");
+    item.count = kUnknownCount;
     items.push_back(std::move(item));
   }
   return items;

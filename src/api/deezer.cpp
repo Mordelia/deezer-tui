@@ -72,7 +72,7 @@ Item parse_album(const nlohmann::json& entry) {
   item.kind = ItemKind::Album;
   item.id = entry.value("id", 0LL);
   item.title = json_string(entry, "title");
-  item.count = entry.value("nb_tracks", 0);
+  item.count = entry.value("nb_tracks", kUnknownCount);
   if (entry.contains("artist")) {
     item.subtitle = json_string(entry["artist"], "name");
   }
@@ -84,7 +84,7 @@ Item parse_artist(const nlohmann::json& entry) {
   item.kind = ItemKind::Artist;
   item.id = entry.value("id", 0LL);
   item.title = json_string(entry, "name");
-  item.count = entry.value("nb_album", 0);
+  item.count = entry.value("nb_album", kUnknownCount);
   return item;
 }
 
@@ -93,7 +93,7 @@ Item parse_playlist(const nlohmann::json& entry) {
   item.kind = ItemKind::Playlist;
   item.id = entry.value("id", 0LL);
   item.title = json_string(entry, "title");
-  item.count = entry.value("nb_tracks", 0);
+  item.count = entry.value("nb_tracks", kUnknownCount);
   if (entry.contains("user")) {
     item.subtitle = json_string(entry["user"], "name");
   }

@@ -49,10 +49,13 @@ std::string format_item_detail(const Item& item) {
   if (item.kind == ItemKind::Section || item.kind == ItemKind::Profile) {
     return {};
   }
-  if (item.kind == ItemKind::Artist) {
-    return std::to_string(item.count) + " albums";
+  if (item.count < 0) {
+    return {};
   }
-  return std::to_string(item.count) + " tracks";
+
+  const std::string noun = item.kind == ItemKind::Artist ? "album" : "track";
+  return std::to_string(item.count) + " " + noun +
+         (item.count == 1 ? "" : "s");
 }
 
 }

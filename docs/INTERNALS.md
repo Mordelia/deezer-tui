@@ -141,6 +141,17 @@ the current user`. The library therefore goes through gw-light:
 Opening a playlist first tries the public API — enough for public playlists, and
 it needs no account — then retries through gw-light on failure.
 
+`deezer.pageProfile` does not carry every count. The `playlists` tab has
+`NB_SONG`, but the `albums` tab has no track count at all, and the `artists` tab
+only has `NB_FAN` — a fan count, not an album count. There is no bulk endpoint to
+fill the gap (`album?ids=` is rejected as an unknown path component), and
+fetching the 113 favourite albums and 43 favourite artists one by one would cost
+more than a hundred requests against a limit of about 50 per five seconds.
+
+Those entries therefore carry `kUnknownCount`, and `format_item_detail` renders
+nothing for them instead of a wrong `0 tracks`. Entries coming from the public
+API do have the counts (`nb_tracks`, `nb_album`), so search results keep theirs.
+
 ## Family profiles
 
 A Family subscription groups several profiles. The ARL belongs to only one of
