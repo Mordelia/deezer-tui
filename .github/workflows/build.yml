@@ -1,0 +1,60 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.compiler }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: gcc
+            cc: gcc
+            cxx: g++
+          - compiler: clang
+            cc: clang
+            cxx: clang++
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential clang cmake pkg-config \
+            libcurl4-openssl-dev nlohmann-json3-dev libssl-dev \
+            libmpv-dev libsystemd-dev
+
+      - name: Configure
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        shell: bash
+        run: |
+          set -o pipefail
+          cmake --build build --parallel "$(nproc)" 2>&1 | tee build.log
+
+      - name: Fail on warnings in the project sources
+        shell: bash
+        run: |
+          if grep 'warning:' build.log | grep -v '_deps'; then
+            echo "::error::compilation produced warnings"
+            exit 1
+          fi
+
+      - name: Self-test
+        run: ./build/deezer-tui --self-test
